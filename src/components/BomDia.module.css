@@ -1,0 +1,65 @@
+﻿.screen {
+  min-height: 100dvh;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 24px 20px 32px;
+}
+
+.top { text-align: center; margin-bottom: 24px; }
+.logo { font-size: 11px; letter-spacing: 3px; color: #6b8f7a; margin-bottom: 12px; }
+.hora { font-size: 52px; font-weight: 600; color: #1a2e22; line-height: 1; letter-spacing: -2px; }
+.data { font-size: 13px; color: #6b8f7a; margin-top: 4px; text-transform: capitalize; }
+
+.card {
+  background: #eaf5ef;
+  border-radius: 14px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+}
+.greeting { font-size: 18px; color: #1a2e22; margin-bottom: 6px; }
+.greeting strong { color: #1a5c36; }
+.msg { font-size: 14px; color: #3d6b4e; line-height: 1.5; }
+
+.stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.stat {
+  background: #f5faf7;
+  border: 1px solid #cde0d5;
+  border-radius: 12px;
+  padding: 14px;
+  text-align: center;
+}
+.statNum  { font-size: 28px; font-weight: 600; color: #1a2e22; line-height: 1; }
+.statLabel { font-size: 11px; color: #6b8f7a; margin-top: 4px; }
+
+.filaLabel {
+  font-size: 10px; font-weight: 700; letter-spacing: 2px;
+  color: #6b8f7a; margin-bottom: 8px;
+}
+.fila {
+  flex: 1; display: flex; flex-direction: column;
+  gap: 6px; margin-bottom: 24px;
+  overflow-y: auto; max-height: 220px;
+}
+.filaItem {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 14px; background: #f5faf7;
+  border: 1px solid #cde0d5; border-radius: 10px;
+}
+.filaSeq  { font-size: 12px; color: #6b8f7a; font-weight: 600; min-width: 24px; }
+.filaVda  { font-size: 16px; font-weight: 600; color: #1a2e22; flex: 1; }
+.filaRota { font-size: 11px; color: #6b8f7a; }
+
+.btnStart {
+  width: 100%; padding: 20px;
+  background: #1a5c36; color: #fff;
+  border-radius: 14px; font-size: 17px;
+  font-weight: 600; border: none; cursor: pointer;
+  margin-top: auto;
+}
+.btnStart:active { background: #0f3d24; }
