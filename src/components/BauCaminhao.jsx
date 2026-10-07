@@ -11,7 +11,7 @@
   '2':{tipo:'Toco',maxKg:6685,cols:5,rows:2},
   '3':{tipo:'Toco',maxKg:6685,cols:5,rows:2},
   'ACCELO':{tipo:'3/4',maxKg:5000,cols:2,rows:2},
-  '59':{tipo:'Contêiner 20 pés',maxKg:12000,cols:2,rows:2},
+  '59':{tipo:'Container 20 pes',maxKg:12000,cols:2,rows:2},
 }
 const SKU_CFG={
   kg3:{sacos:240,kg:3.2,cor:'#20639b',label:'GELO 3KG'},
@@ -23,12 +23,21 @@ const SKU_CFG={
 }
 const PROM=0.60
 function extractVdaNum(v){if(!v)return null;const s=String(v).toUpperCase().trim();if(s.includes('ACCELO')||s.includes('ACELO'))return'ACCELO';const m=s.match(/\d+/);return m?String(parseInt(m[0])):null}
-function getTruckConfig(v,t){const n=extractVdaNum(v);if(n&&FLEET[n])return FLEET[n];const tt=(t||'').toLowerCase();if(tt.includes('truncado'))return{tipo:'Truncado',maxKg:13412,cols:6,rows:2};if(tt.includes('toco'))return{tipo:'Toco',maxKg:6685,cols:5,rows:2};if(tt.includes('container')||tt.includes('contêiner'))return{tipo:'Contêiner',maxKg:12000,cols:2,rows:2};if(tt.includes('3/4')||tt.includes('accelo'))return{tipo:'3/4',maxKg:5000,cols:2,rows:2};return{tipo:'Toco',maxKg:6685,cols:5,rows:2}}
+function getTruckConfig(v,t){
+  const n=extractVdaNum(v)
+  if(n&&FLEET[n])return FLEET[n]
+  const tt=(t||'').toLowerCase()
+  if(tt.includes('truncado')||tt.includes('truck'))return{tipo:'Truncado',maxKg:13412,cols:6,rows:2}
+  if(tt.includes('toco'))return{tipo:'Toco',maxKg:6685,cols:5,rows:2}
+  if(tt.includes('container')||tt.includes('conte'))return{tipo:'Container',maxKg:12000,cols:2,rows:2}
+  if(tt.includes('3/4')||tt.includes('accelo')||tt.includes('34'))return{tipo:'3/4',maxKg:5000,cols:2,rows:2}
+  return{tipo:'Toco',maxKg:6685,cols:5,rows:2}
+}
 export function calcSimuCarga(volumes,vdaStr,vehicleType){
   const trk=getTruckConfig(vdaStr,vehicleType)
   const maxP=trk.cols*trk.rows
   const qty={kg3:0,kg5:0,kg10:0,kg20:0,kg40:0,kg50:0}
-  for(const vol of(volumes||[])){qty.kg3+=vol.planned_kg3||0;qty.kg5+=vol.planned_kg5||0;qty.kg10+=vol.planned_kg10||0;qty.kg20+=vol.planned_kg20||0;qty.kg40+=vol.planned_kg40||0;qty.kg50+=vol.planned_kg50||0}
+  for(const vol of(volumes||[])){qty.kg3+=Number(vol.planned_kg3)||0;qty.kg5+=Number(vol.planned_kg5)||0;qty.kg10+=Number(vol.planned_kg10)||0;qty.kg20+=Number(vol.planned_kg20)||0;qty.kg40+=Number(vol.planned_kg40)||0;qty.kg50+=Number(vol.planned_kg50)||0}
   const ord=['kg40','kg50','kg20','kg10','kg5','kg3']
   const full={},bat={}
   let totalP=0
@@ -90,8 +99,8 @@ export default function BauCaminhao({plan,vdaLabel,tipo}){
             <rect x={bW-4} y={bH*0.3} width="3" height={bH*0.4} rx="1" fill="#8aaa96"/>
             <rect x="4" y={bH-6} width="14" height="5" rx="2" fill="#1a2e22"/>
             <rect x={bW-18} y={bH-6} width="14" height="5" rx="2" fill="#1a2e22"/>
-            <text x={PAD+GAP+2} y={bH-8} fill="#aac8b8" fontSize="6.5" fontWeight="700">◄ FUNDO</text>
-            <text x={bW-PAD-GAP-2} y={bH-8} fill="#aac8b8" fontSize="6.5" fontWeight="700" textAnchor="end">PORTA ►</text>
+            <text x={PAD+GAP+2} y={bH-8} fill="#aac8b8" fontSize="6.5" fontWeight="700">FUNDO</text>
+            <text x={bW-PAD-GAP-2} y={bH-8} fill="#aac8b8" fontSize="6.5" fontWeight="700" textAnchor="end">PORTA</text>
             {Array.from({length:rows},(_,row)=>Array.from({length:cols},(_,col)=>{
               if(centeredCols.has(col)&&row===1)return null
               const gi=row*cols+col,pl=grid[gi]
@@ -99,34 +108,34 @@ export default function BauCaminhao({plan,vdaLabel,tipo}){
               const py=centeredCols.has(col)&&row===0?PAD+GAP+Math.round((PH+GAP)/2):PAD+row*(PH+GAP)+GAP
               const key=`${row}-${col}`
               if(pl){
-                const sl=pl.tipo==='BAT'?'BAT.':pl.tipo==='PROM'?(SKU_CFG[pl.base]?.label||'').replace('GELO ','')+'\u2605':(SKU_CFG[pl.tipo]?.label||pl.tipo).replace('GELO ','')
+                const sl=pl.tipo==='BAT'?'BAT.':pl.tipo==='PROM'?(SKU_CFG[pl.base]?.label||'').replace('GELO ','')+' *':(SKU_CFG[pl.tipo]?.label||pl.tipo).replace('GELO ','')
                 return(<g key={key}><rect x={px+2} y={py+2} width={PW} height={PH} rx="4" fill="rgba(0,0,0,0.08)"/><rect x={px} y={py} width={PW} height={PH} rx="4" fill={pl.cor}/>{pl.tipo==='PROM'&&<rect x={px+3} y={py+3} width={PW-6} height={PH-6} rx="2" fill="none" stroke="rgba(255,255,255,0.45)" strokeWidth="1.5" strokeDasharray="4,2"/>}<line x1={px+4} y1={py+PH/3} x2={px+PW-4} y2={py+PH/3} stroke="rgba(0,0,0,0.15)" strokeWidth="1.5"/><line x1={px+4} y1={py+PH*2/3} x2={px+PW-4} y2={py+PH*2/3} stroke="rgba(0,0,0,0.15)" strokeWidth="1.5"/><rect x={px} y={py} width={PW} height="2" rx="1" fill="rgba(255,255,255,0.15)"/><circle cx={px+9} cy={py+9} r="6.5" fill="rgba(0,0,0,0.38)"/><text x={px+9} y={py+9} fill="white" fontSize="6.5" fontWeight="800" textAnchor="middle" dominantBaseline="middle" fontFamily="monospace">{pl.seq}</text><text x={px+PW/2} y={py+PH/2-4} fill="white" fontSize="10" fontWeight="700" textAnchor="middle">{sl}</text><text x={px+PW/2} y={py+PH/2+8} fill="rgba(255,255,255,0.82)" fontSize="8.5" textAnchor="middle" fontFamily="monospace">{pl.sacos}sc</text></g>)
               }
-              return(<g key={key}><rect x={px} y={py} width={PW} height={PH} rx="4" fill="#eaf5ef" stroke="#cde0d5" strokeWidth="1" strokeDasharray="5,2"/><text x={px+PW/2} y={py+PH/2+5} fill="#c8ddd0" fontSize="16" textAnchor="middle" dominantBaseline="middle">\u25cb</text></g>)
+              return(<g key={key}><rect x={px} y={py} width={PW} height={PH} rx="4" fill="#eaf5ef" stroke="#cde0d5" strokeWidth="1" strokeDasharray="5,2"/><text x={px+PW/2} y={py+PH/2+5} fill="#c8ddd0" fontSize="16" textAnchor="middle" dominantBaseline="middle">o</text></g>)
             }))}
           </g>
-          <text x={CAB+bW/2} y={H-4} fill="#8aaa96" fontSize="8.5" textAnchor="middle" fontWeight="600">{vdaLabel} \u00b7 {tipo} \u00b7 {(maxKg||0).toLocaleString('pt-BR')} KG M\u00c1X.</text>
+          <text x={CAB+bW/2} y={H-4} fill="#8aaa96" fontSize="8.5" textAnchor="middle" fontWeight="600">{vdaLabel} - {tipo} - {(maxKg||0).toLocaleString('pt-BR')} KG MAX.</text>
         </svg>
       </div>
       <div style={{display:'flex',flexWrap:'wrap',gap:'5px 10px',padding:'6px 0 2px'}}>
         {Object.entries(SKU_CFG).map(([k,v])=>(<div key={k} style={{display:'flex',alignItems:'center',gap:4,fontSize:9.5}}><div style={{width:11,height:11,borderRadius:2,background:v.cor,flexShrink:0}}/><span style={{color:'#6b8f7a'}}>{v.label.replace('GELO ','')}</span></div>))}
-        <div style={{display:'flex',alignItems:'center',gap:4,fontSize:9.5}}><div style={{width:11,height:11,borderRadius:2,background:'#b07800',border:'1.5px dashed #e0a800'}}/><span style={{color:'#6b8f7a'}}>PROM. \u226560%</span></div>
+        <div style={{display:'flex',alignItems:'center',gap:4,fontSize:9.5}}><div style={{width:11,height:11,borderRadius:2,background:'#b07800',border:'1.5px dashed #e0a800'}}/><span style={{color:'#6b8f7a'}}>PROM. +60%</span></div>
         <div style={{display:'flex',alignItems:'center',gap:4,fontSize:9.5}}><div style={{width:11,height:11,borderRadius:2,background:'#5a28b0'}}/><span style={{color:'#6b8f7a'}}>BATIDO</span></div>
         <div style={{display:'flex',alignItems:'center',gap:4,fontSize:9.5}}><div style={{width:11,height:11,borderRadius:2,background:'#eaf5ef',border:'1px dashed #cde0d5'}}/><span style={{color:'#6b8f7a'}}>Livre</span></div>
       </div>
-      <div style={{fontSize:8.5,color:'#aac8b8',marginTop:2,marginBottom:6}}>N\u00ba = ordem de carregamento \u00b7 \u25c4 FUNDO entra 1\u00ba \u00b7 PORTA \u25ba entra por \u00faltimo</div>
+      <div style={{fontSize:8.5,color:'#aac8b8',marginTop:2,marginBottom:6}}>N = ordem de carregamento - FUNDO entra 1o - PORTA entra por ultimo</div>
       <div style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8,marginTop:8}}>
-        {[{val:`${totalP}/${maxP}`,label:'PALLETS',extra:overPallets?'\ud83d\udea8 EXCESSO':null,color:overPallets?'#b83030':'#1a2e22'},{val:`${pct}%`,label:'OCUPA\u00c7\u00c3O',extra:acao,color:aprovClr},{val:(totalKg||0).toLocaleString('pt-BR'),label:'KG TOTAL',extra:overWeight?'\u2696\ufe0f SOBREPESO':null,color:overWeight?'#b83030':'#1a2e22'}].map(k=>(<div key={k.label} style={{textAlign:'center',background:'#fff',border:'1px solid #cde0d5',borderRadius:8,padding:'8px 4px'}}><div style={{fontSize:18,fontWeight:800,color:k.color,lineHeight:1}}>{k.val}</div><div style={{fontSize:9,color:'#6b8f7a',marginTop:2}}>{k.label}</div>{k.extra&&<div style={{fontSize:8,color:k.color,fontWeight:600,marginTop:2}}>{k.extra}</div>}</div>))}
+        {[{val:`${totalP}/${maxP}`,label:'PALLETS',extra:overPallets?'EXCESSO':null,color:overPallets?'#b83030':'#1a2e22'},{val:`${pct}%`,label:'OCUPACAO',extra:acao,color:aprovClr},{val:(totalKg||0).toLocaleString('pt-BR'),label:'KG TOTAL',extra:overWeight?'SOBREPESO':null,color:overWeight?'#b83030':'#1a2e22'}].map(k=>(<div key={k.label} style={{textAlign:'center',background:'#fff',border:'1px solid #cde0d5',borderRadius:8,padding:'8px 4px'}}><div style={{fontSize:18,fontWeight:800,color:k.color,lineHeight:1}}>{k.val}</div><div style={{fontSize:9,color:'#6b8f7a',marginTop:2}}>{k.label}</div>{k.extra&&<div style={{fontSize:8,color:k.color,fontWeight:600,marginTop:2}}>{k.extra}</div>}</div>))}
       </div>
       <div style={{marginTop:10,background:'#fff',border:'1px solid #cde0d5',borderRadius:8,padding:'10px 12px'}}>
-        <div style={{fontSize:10,fontWeight:700,color:'#1a2e22',marginBottom:6,display:'flex',justifyContent:'space-between',alignItems:'center'}}><span>\u2696\ufe0f Equil\u00edbrio Lateral</span><span style={{fontSize:9,color:sideOk?'#1a7040':'#b07800',fontWeight:600}}>{sideOk?'\u2705 Equilibrado':'\u26a0\ufe0f Verificar'}</span></div>
+        <div style={{fontSize:10,fontWeight:700,color:'#1a2e22',marginBottom:6,display:'flex',justifyContent:'space-between',alignItems:'center'}}><span>Equilibrio Lateral</span><span style={{fontSize:9,color:sideOk?'#1a7040':'#b07800',fontWeight:600}}>{sideOk?'OK Equilibrado':'Verificar'}</span></div>
         <div style={{display:'flex',alignItems:'center',gap:8}}><div style={{fontSize:11,fontWeight:800,color:'#1a7040',minWidth:38,textAlign:'right'}}>E {pctLeft}%</div><div style={{flex:1,height:14,background:'#f0f5f0',borderRadius:7,overflow:'hidden',display:'flex'}}><div style={{width:`${pctLeft}%`,background:sideOk?'#1a7040':'#b83030',transition:'width 0.3s'}}/><div style={{width:`${pctRight}%`,background:sideOk?'#1558a8':'#b83030',transition:'width 0.3s'}}/></div><div style={{fontSize:11,fontWeight:800,color:'#1558a8',minWidth:38}}>{pctRight}% D</div></div>
-        <div style={{fontSize:8.5,color:'#8aaa96',marginTop:4,textAlign:'center'}}>Esq: {(kgLeft||0).toLocaleString('pt-BR')} kg \u00b7 Dir: {(kgRight||0).toLocaleString('pt-BR')} kg \u00b7 Ideal 35%\u201365%</div>
+        <div style={{fontSize:8.5,color:'#8aaa96',marginTop:4,textAlign:'center'}}>Esq: {(kgLeft||0).toLocaleString('pt-BR')} kg - Dir: {(kgRight||0).toLocaleString('pt-BR')} kg - Ideal 35%-65%</div>
       </div>
-      {hasPromo&&<div style={{marginTop:8,background:'#fffbf0',border:'1px solid #e0a800',borderRadius:8,padding:'8px 10px',fontSize:11}}>\ud83d\udce6 <strong>Pode paletizar:</strong> {Object.entries(promoted).map(([s,d])=>`${SKU_CFG[s]?.label||s}: ${d.sacos}sc (${d.fillPct}%) \u2014 faltam ${d.faltam}sc`).join(' \u00b7 ')}</div>}
-      {hasBat&&!hasPromo&&<div style={{marginTop:8,background:'#f3f0fa',border:'1px solid #8b5cf6',borderRadius:8,padding:'8px 10px',fontSize:11,color:'#5a28b0'}}>\ud83d\udd00 <strong>Carga batida:</strong> {ordered.find(p=>p.tipo==='BAT')?.det||'sacos soltos sem pallet completo'}</div>}
-      {overWeight&&<div style={{marginTop:8,background:'#fff0f0',border:'1px solid #b83030',borderRadius:8,padding:'8px 10px',fontSize:11,color:'#b83030',fontWeight:700}}>\ud83d\udea8 Sobrepeso: {((totalKg||0)-(maxKg||0)).toLocaleString('pt-BR')} kg acima do limite!</div>}
-      {!sideOk&&<div style={{marginTop:8,background:'#fffbf0',border:'1px solid #e0a800',borderRadius:8,padding:'8px 10px',fontSize:11,color:'#b07800'}}>\u26a0\ufe0f Desequil\u00edbrio lateral ({Math.abs(pctLeft-pctRight)}% de diferen\u00e7a). Redistribuir pallets para evitar risco.</div>}
+      {hasPromo&&<div style={{marginTop:8,background:'#fffbf0',border:'1px solid #e0a800',borderRadius:8,padding:'8px 10px',fontSize:11}}>Pode paletizar: {Object.entries(promoted).map(([s,d])=>`${SKU_CFG[s]?.label||s}: ${d.sacos}sc (${d.fillPct}%) - faltam ${d.faltam}sc`).join(' / ')}</div>}
+      {hasBat&&!hasPromo&&<div style={{marginTop:8,background:'#f3f0fa',border:'1px solid #8b5cf6',borderRadius:8,padding:'8px 10px',fontSize:11,color:'#5a28b0'}}>Carga batida: {ordered.find(p=>p.tipo==='BAT')?.det||'sacos soltos sem pallet completo'}</div>}
+      {overWeight&&<div style={{marginTop:8,background:'#fff0f0',border:'1px solid #b83030',borderRadius:8,padding:'8px 10px',fontSize:11,color:'#b83030',fontWeight:700}}>SOBREPESO: {((totalKg||0)-(maxKg||0)).toLocaleString('pt-BR')} kg acima do limite!</div>}
+      {!sideOk&&<div style={{marginTop:8,background:'#fffbf0',border:'1px solid #e0a800',borderRadius:8,padding:'8px 10px',fontSize:11,color:'#b07800'}}>Desequilibrio lateral ({Math.abs(pctLeft-pctRight)}% de diferenca). Redistribuir pallets para evitar risco.</div>}
     </div>
   )
 }
