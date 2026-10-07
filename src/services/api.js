@@ -1,4 +1,4 @@
-﻿const BASE = import.meta.env.VITE_API_URL || "http://localhost:3001/api"
+const BASE = import.meta.env.VITE_API_URL || "http://localhost:3001/api"
 
 async function request(method, path, body) {
   const res = await fetch(`${BASE}${path}`, {
@@ -17,6 +17,22 @@ export const api = {
   getVeiculosHoje: () => {
     const today = new Date().toISOString().slice(0, 10)
     return request("GET", `/plans/${today}/vehicles`)
+  },
+
+  // Upload do arquivo Excel de programação (multipart/form-data)
+  importarProgramacao: async (file) => {
+    const form = new FormData()
+    form.append("file", file)
+    const res = await fetch(`${BASE}/plans/import-programacao`, {
+      method: "POST",
+      body: form,
+      // Sem Content-Type — o browser define automaticamente com o boundary correto
+    })
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: res.statusText }))
+      throw new Error(err.error || `HTTP ${res.status}`)
+    }
+    return res.json()
   },
 
   iniciarCarga: (vehicleId) =>

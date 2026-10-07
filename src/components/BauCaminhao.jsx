@@ -1,15 +1,15 @@
 ﻿const FLEET={
-  '66':{tipo:'Truncado',maxKg:13412,cols:6,rows:2},
-  '94':{tipo:'Truncado',maxKg:13412,cols:6,rows:2},
-  '90':{tipo:'Truncado',maxKg:13412,cols:6,rows:2},
-  '47':{tipo:'Truncado',maxKg:13412,cols:6,rows:2},
-  '46':{tipo:'Truncado',maxKg:13412,cols:5,rows:2},
-  '70':{tipo:'Toco',maxKg:6685,cols:5,rows:2},
-  '80':{tipo:'Toco',maxKg:6685,cols:5,rows:2},
-  '81':{tipo:'Toco',maxKg:6685,cols:5,rows:2},
-  '1':{tipo:'Toco',maxKg:6685,cols:5,rows:2},
-  '2':{tipo:'Toco',maxKg:6685,cols:5,rows:2},
-  '3':{tipo:'Toco',maxKg:6685,cols:5,rows:2},
+  '66':{tipo:'Truncado',maxKg:16000,cols:6,rows:2},
+  '94':{tipo:'Truncado',maxKg:16000,cols:6,rows:2},
+  '90':{tipo:'Truncado',maxKg:16000,cols:6,rows:2},
+  '47':{tipo:'Truncado',maxKg:16000,cols:6,rows:2},
+  '46':{tipo:'Truncado',maxKg:16000,cols:5,rows:2},
+  '70':{tipo:'Toco',maxKg:8800,cols:5,rows:2},
+  '80':{tipo:'Toco',maxKg:8800,cols:5,rows:2},
+  '81':{tipo:'Toco',maxKg:8800,cols:5,rows:2},
+  '1':{tipo:'Toco',maxKg:8800,cols:5,rows:2},
+  '2':{tipo:'Toco',maxKg:8800,cols:5,rows:2},
+  '3':{tipo:'Toco',maxKg:8800,cols:5,rows:2},
   'ACCELO':{tipo:'3/4',maxKg:5000,cols:2,rows:2},
   '59':{tipo:'Container 20 pes',maxKg:12000,cols:2,rows:2},
 }
@@ -27,8 +27,8 @@ function getTruckConfig(v,t){
   const n=extractVdaNum(v)
   if(n&&FLEET[n])return FLEET[n]
   const tt=(t||'').toLowerCase()
-  if(tt.includes('truncado')||tt.includes('truck'))return{tipo:'Truncado',maxKg:13412,cols:6,rows:2}
-  if(tt.includes('toco'))return{tipo:'Toco',maxKg:6685,cols:5,rows:2}
+  if(tt.includes('truncado')||tt.includes('truck'))return{tipo:'Truncado',maxKg:16000,cols:6,rows:2}
+  if(tt.includes('toco'))return{tipo:'Toco',maxKg:8800,cols:5,rows:2}
   if(tt.includes('container')||tt.includes('conte'))return{tipo:'Container',maxKg:12000,cols:2,rows:2}
   if(tt.includes('3/4')||tt.includes('accelo')||tt.includes('34'))return{tipo:'3/4',maxKg:5000,cols:2,rows:2}
   return{tipo:'Toco',maxKg:6685,cols:5,rows:2}
