@@ -19,22 +19,6 @@ export const api = {
     return request("GET", `/plans/${today}/vehicles`)
   },
 
-  // Upload do arquivo Excel de programação (multipart/form-data)
-  importarProgramacao: async (file) => {
-    const form = new FormData()
-    form.append("file", file)
-    const res = await fetch(`${BASE}/plans/import-programacao`, {
-      method: "POST",
-      body: form,
-      // Sem Content-Type — o browser define automaticamente com o boundary correto
-    })
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({ error: res.statusText }))
-      throw new Error(err.error || `HTTP ${res.status}`)
-    }
-    return res.json()
-  },
-
   iniciarCarga: (vehicleId) =>
     request("POST", `/vehicles/${vehicleId}/carga-inicio`, {
       actorName: "Edinaldo Palmas",
